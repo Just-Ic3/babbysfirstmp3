@@ -43,7 +43,7 @@ class PlayerX extends JFrame implements ChangeListener
 	private JProgressBar barra1;	
 	private audioFile filename = new audioFile("El Bombito.wav");
 	private FloatControl control;
-	
+	////
         private  final int  BUFFER_SIZE = 128000;
         private  File soundFile;
         private  AudioInputStream audioStream;
@@ -121,7 +121,14 @@ class PlayerX extends JFrame implements ChangeListener
 		{
 			if(evento.getSource() == botonPlay)
 			{
-				playSound(filename.getNombre());
+                            new Thread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    playSound(filename.getNombre());
+                                }
+                            }).start();
 				new Thread(new Runnable() 
 				{
 					@Override
@@ -130,7 +137,6 @@ class PlayerX extends JFrame implements ChangeListener
 						try {
 							long operationTime;
 							int m=0, t=0;
-							barra1.setMaximum((int)getWavLength(filename.getNombre()));
 							for(int s=0;t<=getWavLength(filename.getNombre());s++, t++) 
 							{
 								while (!running)
@@ -138,19 +144,19 @@ class PlayerX extends JFrame implements ChangeListener
 								botonPlay.setVisible(false);
 								botonPause.setVisible(true);
 								operationTime = (long)(1000);
-								if (s>60)
+								/*if (s>60)
 									m++;
 								if (s<10)
 									timeRunning.setText(m+":0"+s);
 								else
 									timeRunning.setText(m+":"+s);
-								barra1.setValue(s);
+								barra1.setValue(s);*/
 								Thread.sleep(operationTime);
 							}
-							timeRunning.setText("0:00");
+							//timeRunning.setText("0:00");
 							botonPlay.setVisible(true);
 							botonPause.setVisible(false);
-							barra1.setValue(0);
+							//barra1.setValue(0);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						} catch (UnsupportedAudioFileException ex) {
@@ -160,13 +166,23 @@ class PlayerX extends JFrame implements ChangeListener
 						}
 					}//public void run()
 				}).start();//new Thread
+                                running=true;
 			}//botonPlay
 			if(evento.getSource() == botonPause)
 			{
-				running=false;
-				botonPlay.setVisible(true);
-				botonPause.setVisible(false);
-				System.out.println(filename.getNombre());
+                            try {
+                                running=false;
+                                botonPlay.setVisible(true);
+                                botonPause.setVisible(false);
+                                System.out.println(filename.getNombre());
+                                pause();
+                                barra1.setMaximum((int)getWavLength(filename.getNombre()));
+                            } //botonPause
+                            catch (UnsupportedAudioFileException ex) {
+                                Logger.getLogger(PlayerX.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(PlayerX.class.getName()).log(Level.SEVERE, null, ex);
+                            }
 			}//botonPause
 			if(evento.getSource() == botonNext)
 			{
@@ -178,15 +194,14 @@ class PlayerX extends JFrame implements ChangeListener
 			}//botonPrev
 		}//actionPerformed
 	}//class ManejadorCampos
-        
-        
-        
+        public void pause()
+        {
+            sourceLine.stop();
+            barra1.setValue(0);
+            barra1.setMaximum(0);
+        }
         public void playSound(final String filename)
         {
-            new Thread(new Runnable() 
-            {
-            	public void run() 
-            	{
             		String strFilename = filename;
             		try {
             			soundFile = new File(strFilename);
@@ -230,9 +245,6 @@ class PlayerX extends JFrame implements ChangeListener
             		}//while
             		sourceLine.drain();
             		sourceLine.close();
-            	}//public void run()
-            }).start();//Thread (kek)
-            running=true;
         }//playSound
         
         public void pauseThread() throws InterruptedException

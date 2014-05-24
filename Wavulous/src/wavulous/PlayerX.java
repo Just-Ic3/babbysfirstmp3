@@ -34,7 +34,7 @@ class PlayerX extends JFrame implements ChangeListener
                 botonPlay, botonNext, 
                 botonPrev, botonPause;
 //	private JButton botonHide;
-    private JLabel timeRunning;
+        private JLabel timeRunning;
 	private JSlider slider1;
 	private ImageIcon
                 play, pause,
@@ -43,7 +43,7 @@ class PlayerX extends JFrame implements ChangeListener
 	private JProgressBar barra1;	
 	private audioFile filename = new audioFile("El Bombito.wav");
 	private FloatControl control;
-	////
+        
         private  final int  BUFFER_SIZE = 128000;
         private  File soundFile;
         private  AudioInputStream audioStream;
@@ -57,142 +57,142 @@ class PlayerX extends JFrame implements ChangeListener
 	
 	public PlayerX()
 	{
-		super("Wavulous Audio Player");
-		setLayout(null);
-		ManejadorCampos manejador = new ManejadorCampos();
-		play = new ImageIcon("play.png");
-		next = new ImageIcon("next.png");
-		prev = new ImageIcon("prev.png");
-        pause = new ImageIcon("pause.png");
-//		hide = new ImageIcon("hide.png");
-//		sound = new ImageIcon("sound.png");
-		botonPlay = new JButton(play);
-        botonPause = new JButton(pause);
-		botonNext = new JButton(next);
-		botonPrev = new JButton(prev);
-		slider1 = new JSlider(JSlider.VERTICAL, 0,1000,500);
-		slider1.setBounds(375, 8, 30, 100);
-		slider1.setEnabled(true);
-		timeRunning = new JLabel();
-        timeRunning.setText("0:00");
-		barra1 = new JProgressBar();
+            super("Wavulous Audio Player");
+            setLayout(null);
+            ManejadorCampos manejador = new ManejadorCampos();
+            play = new ImageIcon("play.png");
+            next = new ImageIcon("next.png");
+            prev = new ImageIcon("prev.png");
+            pause = new ImageIcon("pause.png");
+//          hide = new ImageIcon("hide.png");
+//          sound = new ImageIcon("sound.png");
+            botonPlay = new JButton(play);
+            botonPause = new JButton(pause);
+            botonNext = new JButton(next);
+            botonPrev = new JButton(prev);
+            slider1 = new JSlider(JSlider.VERTICAL, 0,1000,500);
+            slider1.setBounds(375, 8, 30, 100);
+            slider1.setEnabled(true);
+            timeRunning = new JLabel();
+            timeRunning.setText("0:00");
+            barra1 = new JProgressBar();
                 
-        timeRunning.setBounds(178, 115, 340, 10);
-		botonPrev.setMargin(new Insets(0, 0, 0, 0));
-		botonPrev.setBounds(10, 20, 60, 60);
-		botonPrev.setFocusable(false);
-		botonPlay.setMargin(new Insets(0, 0, 0, 0));
-		botonPlay.setBounds(160, 20, 60, 60);
-		botonPlay.setFocusable(false);
-        botonPause.setMargin(new Insets(0, 0, 0, 0));
-		botonPause.setBounds(160, 20, 60, 60);
-		botonPause.setFocusable(false);
-        botonPause.setVisible(false);
-		botonNext.setMargin(new Insets(0, 0, 0, 0));
-		botonNext.setBounds(310, 20, 60, 60);
-		botonNext.setFocusable(false);
-		barra1.setBounds(20, 100, 340, 10);
-		
-		botonPlay.addActionListener(manejador);
-		botonNext.addActionListener(manejador);
-		botonPrev.addActionListener(manejador);
-        botonPause.addActionListener(manejador);
+            timeRunning.setBounds(178, 115, 340, 10);
+            botonPrev.setMargin(new Insets(0, 0, 0, 0));
+            botonPrev.setBounds(10, 20, 60, 60);
+            botonPrev.setFocusable(false);
+            botonPlay.setMargin(new Insets(0, 0, 0, 0));
+            botonPlay.setBounds(160, 20, 60, 60);
+            botonPlay.setFocusable(false);
+            botonPause.setMargin(new Insets(0, 0, 0, 0));
+            botonPause.setBounds(160, 20, 60, 60);
+            botonPause.setFocusable(false);
+            botonPause.setVisible(false);
+            botonNext.setMargin(new Insets(0, 0, 0, 0));
+            botonNext.setBounds(310, 20, 60, 60);
+            botonNext.setFocusable(false);
+            barra1.setBounds(20, 100, 340, 10);
+        
+            botonPlay.addActionListener(manejador);
+            botonNext.addActionListener(manejador);
+            botonPrev.addActionListener(manejador);
+            botonPause.addActionListener(manejador);
                 
-	/*	slider1.addChangeListener(new ChangeListener() 
-		{
+            /*slider1.addChangeListener(new ChangeListener() 
+            {
 	        public void stateChanged(ChangeEvent event) //valores del slider, deberan cambiar el volumen
 	        {
-	        	JSlider slider1 = (JSlider)event.getSource();
+                    JSlider slider1 = (JSlider)event.getSource();
 	       	}//stateChanged
-		});//slider1.addChangeListener */
+            });//slider1.addChangeListener */
                 
-        add(timeRunning);
-		add(botonPlay);
-        add(botonPause);
-		add(botonNext);
-		add(botonPrev);
-		add(barra1);
-		add(slider1);
-	}//public PlayerX
-        
+            add(timeRunning);
+            add(botonPlay);
+            add(botonPause);
+            add(botonNext);
+            add(botonPrev);
+            add(barra1);
+            add(slider1);
+        }//public PlayerX
 	class ManejadorCampos implements ActionListener
 	{
-		public void actionPerformed(ActionEvent evento)
-		{
-			if(evento.getSource() == botonPlay)
-			{
-                            new Thread(new Runnable()
+            
+            public void actionPerformed(ActionEvent evento)
+            {
+                if(evento.getSource() == botonPlay)
+                {
+                    new Thread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            playSound(filename.getNombre());
+                        }
+                    }).start();
+                        new Thread(new Runnable() 
+                        {
+                            @Override
+                            public void run() 
                             {
-                                @Override
-                                public void run()
-                                {
-                                    playSound(filename.getNombre());
-                                }
-                            }).start();
-				new Thread(new Runnable() 
-				{
-					@Override
-					public void run() 
-					{
-						try {
-							long operationTime;
-							int m=0, t=0;
-							for(int s=0;t<=getWavLength(filename.getNombre());s++, t++) 
-							{
-								while (!running)
-									Thread.yield();
-								botonPlay.setVisible(false);
-								botonPause.setVisible(true);
-								operationTime = (long)(1000);
-								/*if (s>60)
-									m++;
-								if (s<10)
-									timeRunning.setText(m+":0"+s);
-								else
-									timeRunning.setText(m+":"+s);
-								barra1.setValue(s);*/
-								Thread.sleep(operationTime);
-							}
-							//timeRunning.setText("0:00");
-							botonPlay.setVisible(true);
-							botonPause.setVisible(false);
-							//barra1.setValue(0);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} catch (UnsupportedAudioFileException ex) {
-							Logger.getLogger(Wavulous.class.getName()).log(Level.SEVERE, null, ex);
-						} catch (IOException ex) {
-							Logger.getLogger(Wavulous.class.getName()).log(Level.SEVERE, null, ex);
-						}
-					}//public void run()
-				}).start();//new Thread
-                                running=true;
-			}//botonPlay
-			if(evento.getSource() == botonPause)
-			{
-                            try {
-                                running=false;
-                                botonPlay.setVisible(true);
-                                botonPause.setVisible(false);
-                                System.out.println(filename.getNombre());
-                                pause();
-                                barra1.setMaximum((int)getWavLength(filename.getNombre()));
-                            } //botonPause
-                            catch (UnsupportedAudioFileException ex) {
-                                Logger.getLogger(PlayerX.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
-                                Logger.getLogger(PlayerX.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-			}//botonPause
-			if(evento.getSource() == botonNext)
-			{
-				
-			}//botonNext
-			if(evento.getSource() == botonPrev)
-			{
-				
-			}//botonPrev
-		}//actionPerformed
+                                try {
+                                    long operationTime;
+                                    int m=0, t=0;
+                                    for(int s=0;t<=getWavLength(filename.getNombre());s++, t++) 
+                                    {
+                                            while (!running)
+                                                    Thread.yield();
+                                            botonPlay.setVisible(false);
+                                            botonPause.setVisible(true);
+                                            operationTime = (long)(1000);
+                                            /*if (s>60)
+                                                    m++;
+                                            if (s<10)
+                                                    timeRunning.setText(m+":0"+s);
+                                            else
+                                                    timeRunning.setText(m+":"+s);
+                                            barra1.setValue(s);*/
+                                            Thread.sleep(operationTime);
+                                    }
+                                    //timeRunning.setText("0:00");
+                                    botonPlay.setVisible(true);
+                                    botonPause.setVisible(false);
+                                    //barra1.setValue(0);
+                                    } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                    } catch (UnsupportedAudioFileException ex) {
+                                            Logger.getLogger(Wavulous.class.getName()).log(Level.SEVERE, null, ex);
+                                    } catch (IOException ex) {
+                                            Logger.getLogger(Wavulous.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                            }//public void run()
+                        }).start();//new Thread
+                        running=true;
+                }//botonPlay
+                if(evento.getSource() == botonPause)
+                {
+                    try {
+                        running=false;
+                        botonPlay.setVisible(true);
+                        botonPause.setVisible(false);
+                        System.out.println(filename.getNombre());
+                        pause();
+                        barra1.setMaximum((int)getWavLength(filename.getNombre()));
+                    } //botonPause
+                    catch (UnsupportedAudioFileException ex) {
+                        Logger.getLogger(PlayerX.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(PlayerX.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }//botonPause
+                if(evento.getSource() == botonNext)
+                {
+
+                }//botonNext
+                if(evento.getSource() == botonPrev)
+                {
+
+                }//botonPrev
+            }//actionPerformed
 	}//class ManejadorCampos
         public void pause()
         {
@@ -245,13 +245,11 @@ class PlayerX extends JFrame implements ChangeListener
             		}//while
             		sourceLine.drain();
             		sourceLine.close();
-        }//playSound
-        
+        }//public void playSound(final String filename)
         public void pauseThread() throws InterruptedException
         {
             running = false;
-        }//pauseThread
-        
+        }//public void pauseThread() throws InterruptedException
         public double getWavLength(String filename) throws UnsupportedAudioFileException, IOException
         {
             File file = new File(filename);
@@ -260,8 +258,7 @@ class PlayerX extends JFrame implements ChangeListener
             long frames = audioInputStream.getFrameLength();
             double durationInSeconds = (frames+0.0) / format.getFrameRate(); 
             return durationInSeconds;
-        }//getWavLength
-        
+        }//public double getWavLength(String filename) throws UnsupportedAudioFileException, IOException
         /*public void timeRan(final String filename)
         {
 	        new Thread(new Runnable() 
@@ -293,6 +290,4 @@ class PlayerX extends JFrame implements ChangeListener
 	        }//public void run() 
         }).start();//new Thread
     }//timeRan*/
-        
-        
 }//class PlayerX

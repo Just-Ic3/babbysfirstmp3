@@ -5,7 +5,6 @@ package wavulous;
  * @author Luis
  */
 public class audioFile {
-    
     private String nombre;
     private float volume;
     
@@ -13,7 +12,6 @@ public class audioFile {
     {
         nombre = name;
     }
-    
     public String getNombre()
     {
         return nombre;
@@ -22,5 +20,4 @@ public class audioFile {
     {
         return volume;
     }
-
 }

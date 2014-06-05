@@ -9,7 +9,17 @@ package javafxswingtest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.media.Media;
@@ -20,6 +30,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 /**
@@ -39,6 +50,11 @@ class MP3Panel extends JFrame{
     private File thisfile;
     private Box box1, box2;
     private Runnable autoplay;
+    private ObjectOutputStream writer;
+    private ObjectInputStream reader;
+    private String getpath;
+    private JOptionPane pathgiver;
+    private List<String> songsinfolder;
     
     public MP3Panel()
     {
@@ -50,15 +66,37 @@ class MP3Panel extends JFrame{
         bwdbtn = new JButton(bwd);
         fwdbtn = new JButton(fwd);
         playbtn = new JButton(play);
+        /* To be deprecated for file calling, etc.
         song1 = new Song("Blumenkranz.mp3");
         song2 = new Song("Dimensiontripper!!!!.mp3");
         song3 = new Song("misterioso.mp3");
-        playlist = new Playlist();
         playlist.addSong(song1);
         playlist.addSong(song2);
         playlist.addSong(song3);
+        */
+        
+        getpath = JOptionPane.showInputDialog("Porfavor, ingrese el path de donde desea agregar su musica.\n Ej: C:/Usuarios/Yo/Musica");
+        songsinfolder = reapSongs(getpath);
+        playlist = new Playlist("My Songs",songsinfolder);
+        
         numtracks = playlist.getNumTracks();
+        System.out.println("Se consiguieron: " + numtracks + " canciones.");
         currenttrack = 0;
+        
+        
+        /* A implementarse luego ya que existan varias playlists o playlist collections.
+        try
+        {
+        writer = new ObjectOutputStream(new FileOutputStream("songs.dat"));
+        }
+        catch(FileNotFoundException e)
+        {
+            System.out.println("No se encontro el archivo.");
+        } 
+        catch (IOException ex){ 
+            System.out.println("No se pudo escribir el archivo.");
+        }   
+        */
         autoplay = new Runnable(){
             public void run()
             {
@@ -110,6 +148,25 @@ class MP3Panel extends JFrame{
         getContentPane().add(box1);
         getContentPane().add(box2);
         
+    }
+    
+    private List<String> reapSongs(String dir)
+    {
+        int i=0; //For debugging plz take out later.
+        List<String> mp3s = new ArrayList<String>();
+        File directory = new File(dir);
+        for(File file : directory.listFiles())
+        {
+            System.out.println(file.getName());
+            if(file.getName().toLowerCase().endsWith((".mp3")))
+            {
+                mp3s.add(dir + "/" + file.getName());
+                System.out.println("Esto es lo que genera reapSongs: " + mp3s.get(i));
+                i++;
+            }    
+        }
+        System.out.println("Si entre, nomas no sabes que pedo :b");
+        return mp3s;
     }
     
     /*private Media intoMedia(Song a)

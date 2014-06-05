@@ -7,6 +7,7 @@
 package javafxswingtest;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -27,6 +28,16 @@ class Playlist implements Serializable
     {
         name = a;
         songlist = new Song[0];
+    }
+    
+    public Playlist(String a, List<String>b)
+    {
+        name = a;
+        songlist = new Song[b.size()];
+        for(int i=0; i<songlist.length; i++)
+        {
+            songlist[i] = new Song(b.get(i));
+        }
     }
     
     public Song[] getSongList()

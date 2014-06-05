@@ -10,6 +10,9 @@ import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.scene.media.Media;
@@ -70,13 +73,23 @@ class Song {
     
     private void makeMedia()
     {
+        /* Esperemos que ya no necesitemos esto.
         File afile = new File(filename);
-        aURI = afile.toURI();
+        if(afile.exists())
+            System.out.println("Si existe hasta aqui");
+        Rejoice! Capaz y nos deshacemos de URI completamente.       
+        try {
+            aURI = new URI(filename);
+        } catch (URISyntaxException ex) {
+            System.out.println("Crear el nuevo URI no funciono. ):");
+        }
+         System.out.println(aURI.toString());
+        */
         Platform.runLater(new Runnable() {
 
             @Override
             public void run() {
-        song = new Media(aURI.toString());
+        song = new Media("file:/" + filename);
         readID3Tag();
             }
         }); 

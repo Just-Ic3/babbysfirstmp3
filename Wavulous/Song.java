@@ -89,7 +89,7 @@ class Song {
 
             @Override
             public void run() {
-        song = new Media("file:/" + filename);
+        song = new Media("file:/" + filename.replace(" ","%20"));
         readID3Tag();
             }
         }); 

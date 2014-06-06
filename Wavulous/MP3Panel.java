@@ -6,6 +6,7 @@
 
 package javafxswingtest;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -30,7 +31,10 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
 /**
@@ -38,17 +42,20 @@ import javax.swing.JTextArea;
  * @author Alex
  */
 class MP3Panel extends JFrame{
+    private JPanel playerpanel, functionalpanel, listpanel, artistpanel, custompanel, optionpanel;
+    private JList playlistlist, customplaylistlist, songslist;
+    private JTabbedPane functionalpane;
     private int numtracks, currenttrack;
     private Media playingnow;
     private MediaPlayer player;
-    private JButton playbtn, fwdbtn, bwdbtn;
+    private JButton playbtn, fwdbtn, bwdbtn, createplaylistbtn, editplaylistbtn, deleteplaylistbtn, addmusicbtn;
     private ImageIcon play, pause, fwd, bwd;
     private JTextArea nowplaying;
     private Playlist playlist;
     private Song song1, song2, song3, thissong;
     private URI thisURI;
     private File thisfile;
-    private Box box1, box2;
+    private Box box1, box2, box3, box4, box5;
     private Runnable autoplay;
     private ObjectOutputStream writer;
     private ObjectInputStream reader;
@@ -66,6 +73,10 @@ class MP3Panel extends JFrame{
         bwdbtn = new JButton(bwd);
         fwdbtn = new JButton(fwd);
         playbtn = new JButton(play);
+        createplaylistbtn = new JButton("Crear Playlist");
+        editplaylistbtn = new JButton("Editar Playlist");
+        deleteplaylistbtn = new JButton("Borrar Playlist");
+        addmusicbtn = new JButton("Agregar Musica");
         /* To be deprecated for file calling, etc.
         song1 = new Song("Blumenkranz.mp3");
         song2 = new Song("Dimensiontripper!!!!.mp3");
@@ -131,23 +142,46 @@ class MP3Panel extends JFrame{
         nowplaying = new JTextArea(3, 50);
         nowplaying.setText("");
         nowplaying.setEditable(false);
-       
+        
         
         ActionManager actman = new ActionManager();
         playbtn.addActionListener(actman);
         fwdbtn.addActionListener(actman);
         bwdbtn.addActionListener(actman);
         
-        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+        playerpanel = new JPanel();
+        playerpanel.setLayout(new BoxLayout(playerpanel, BoxLayout.Y_AXIS));
         box1 = new Box(BoxLayout.X_AXIS);
         box1.add(nowplaying);
         box2 = new Box(BoxLayout.X_AXIS);
         box2.add(bwdbtn);
         box2.add(playbtn);
         box2.add(fwdbtn);
-        getContentPane().add(box1);
-        getContentPane().add(box2);
-        
+        playerpanel.add(box1);
+        playerpanel.add(box2);
+        functionalpanel = new JPanel(new BorderLayout());
+        functionalpane = new JTabbedPane();
+        artistpanel = new JPanel(new BorderLayout());
+        playlistlist = new JList(); //Aqui iran las playlists generadas.
+        artistpanel.add(playlistlist);
+        functionalpane.add("Artistas",artistpanel);
+        custompanel = new JPanel(new BorderLayout());
+        customplaylistlist = new JList();
+        custompanel.add(customplaylistlist);
+        functionalpane.add("Playlists Personalizadas",custompanel);
+        optionpanel = new JPanel();
+        optionpanel.setLayout(new BoxLayout(optionpanel, BoxLayout.Y_AXIS));
+        optionpanel.add(createplaylistbtn);
+        optionpanel.add(editplaylistbtn);
+        optionpanel.add(deleteplaylistbtn);
+        optionpanel.add(addmusicbtn);
+        functionalpane.add("Opciones",optionpanel);
+        functionalpanel.add(functionalpane);
+        box3 = new Box(BoxLayout.Y_AXIS);
+        box3.add(playerpanel);
+        box3.add(functionalpanel);
+        add(box3);
     }
     
     private List<String> reapSongs(String dir)

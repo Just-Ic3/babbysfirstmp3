@@ -109,6 +109,7 @@ class Song implements Serializable
             }
             
         });
+        checkForNulls();
     }
     
     private void detectMetadata(String key, Object value)
@@ -128,6 +129,16 @@ class Song implements Serializable
                    albumart = new ImageIcon((Image)value);
                    break;
            }
+    }
+    
+    private void checkForNulls()
+    {
+        if(name == null)
+            name = "Untitled";
+         if(artist == null)
+            artist = "Unknown Artist";
+        if(album == null)
+            album = "Unknown Album";
     }
     
     public void readID3Tag(String a)
@@ -164,12 +175,6 @@ class Song implements Serializable
     
     public String printInfo()
     {
-        if(name == null)
-            name = "Untitled";
-        if(artist == null)
-            artist = "Unknown Artist";
-        if(album == null)
-            album = "Unknown Album";
         String info = name + "\n" + artist + "\n" + album;
         return info;
     }

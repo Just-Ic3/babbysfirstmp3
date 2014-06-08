@@ -100,6 +100,30 @@ class Playlist implements Serializable
         }
     }
     
+    public boolean addSong(String a)
+    {
+        if(!alreadyHaveSong(a))
+        {
+            Song[] songlistadd = new Song[songlist.length+1];
+            for(int i=0; i<songlist.length; i++)
+                songlistadd[i]=songlist[i];
+            songlistadd[songlist.length] = new Song(a);
+            songlist = songlistadd;
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean alreadyHaveSong(String a)
+    {
+        for(int i=0; i<songlist.length; i++)
+        {
+            if(songlist[i].getFilename().equals(a))
+                return true;
+        }
+        return false;
+    }
+    
     public boolean deleteSong(String a)
     {
         if(!hasSong(a))

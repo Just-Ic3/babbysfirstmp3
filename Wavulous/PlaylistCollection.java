@@ -33,6 +33,18 @@ public class PlaylistCollection implements Serializable
         
     }
     
+    public void addSongs(List<String> a)
+    {
+        int c=0;
+        for(int i=0; i<a.size(); i++)
+        {
+            if(allsongs.addSong(a.get(i)))
+                c++;
+        }
+        System.out.println("Se agregaron: " + c + " canciones.");
+        getArtistNames();
+    }
+    
     public int getAllSongsLength()
     {
         return allsongs.getNumTracks();

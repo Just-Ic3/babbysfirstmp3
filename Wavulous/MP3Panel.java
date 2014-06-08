@@ -7,6 +7,7 @@
 package javafxswingtest;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -30,6 +31,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -43,12 +45,14 @@ import javax.swing.JTextArea;
  */
 class MP3Panel extends JFrame{
     private JPanel playerpanel, functionalpanel, listpanel, artistpanel, custompanel, optionpanel;
+    private JDialog createplaylistdialog, editplaylistdialog, deleteplaylistdialog;
     private JList playlistlist, customplaylistlist, songslist;
     private JTabbedPane functionalpane;
     private int numtracks, currenttrack;
     private Media playingnow;
     private MediaPlayer player;
     private JButton playbtn, fwdbtn, bwdbtn, createplaylistbtn, editplaylistbtn, deleteplaylistbtn, addmusicbtn;
+    private JButton a;
     private ImageIcon play, pause, fwd, bwd;
     private JTextArea nowplaying;
     private PlaylistCollection automatedplaylists, customplaylists;
@@ -158,6 +162,10 @@ class MP3Panel extends JFrame{
         playbtn.addActionListener(actman);
         fwdbtn.addActionListener(actman);
         bwdbtn.addActionListener(actman);
+        createplaylistbtn.addActionListener(actman);
+        editplaylistbtn.addActionListener(actman);
+        deleteplaylistbtn.addActionListener(actman);
+        addmusicbtn.addActionListener(actman);
         
         setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
         playerpanel = new JPanel();
@@ -181,7 +189,7 @@ class MP3Panel extends JFrame{
         custompanel.add(customplaylistlist);
         functionalpane.add("Playlists Personalizadas",custompanel);
         optionpanel = new JPanel();
-        optionpanel.setLayout(new BoxLayout(optionpanel, BoxLayout.Y_AXIS));
+        optionpanel.setLayout(new GridLayout(0,4));
         optionpanel.add(createplaylistbtn);
         optionpanel.add(editplaylistbtn);
         optionpanel.add(deleteplaylistbtn);
@@ -323,6 +331,28 @@ class MP3Panel extends JFrame{
                         playbtn.setIcon(pause);
                     }
                 });
+            }
+            
+            if(e.getSource() == createplaylistbtn)
+            {
+                
+            }
+            
+            if(e.getSource() == editplaylistbtn)
+            {
+                
+            }
+            
+            if(e.getSource() == deleteplaylistbtn)
+            {
+                
+            }
+            
+            if(e.getSource() == addmusicbtn)
+            {
+                getpath = JOptionPane.showInputDialog("Porfavor, ingrese el path de donde desea agregar su musica.\nEj: C:\\Usuarios\\Yo\\Musica");
+                songsinfolder = reapSongs(getpath);
+                automatedplaylists.addSongs(songsinfolder);
             }
         }
     }

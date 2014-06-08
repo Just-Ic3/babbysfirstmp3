@@ -27,15 +27,21 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 /**
  *
@@ -44,21 +50,28 @@ import javax.swing.JTextArea;
 class MP3Panel extends JFrame{
     private JPanel playerpanel, functionalpanel, listpanel, artistpanel, custompanel, optionpanel;
     private JDialog createplaylistdialog, editplaylistdialog, deleteplaylistdialog;
-    private JList playlistlist, customplaylistlist, songslist;
+    private DefaultListModel playlistlistmodel, customplaylistlistmodel, songlistmodel, tobeaddedmodel, addedmodel;
+    private JList playlistlist, customplaylistlist, songlist, tobeadded, added;
+    private List passer;
+    private JComboBox playlistbox;
+    private DefaultComboBoxModel playlistboxmodel;
     private JTabbedPane functionalpane;
-    private int numtracks, currenttrack;
+    private int numtracks, currenttrack, toedit;
     private Media playingnow;
     private MediaPlayer player;
     private JButton playbtn, fwdbtn, bwdbtn, createplaylistbtn, editplaylistbtn, deleteplaylistbtn, addmusicbtn;
-    private JButton a;
+    private JButton passbtn, returnbtn, okbtn, cancelbtn;
     private ImageIcon play, pause, fwd, bwd;
     private JTextArea nowplaying;
+    private JTextField playlistnameinput;
+    private JLabel playlistnamelabel;
     private PlaylistCollection playlistcollection;
     private Playlist playlist;
     private Song song1, song2, song3, thissong;
     private URI thisURI;
     private File thisfile;
-    private Box box1, box2, box3, box4, box5;
+    private Box box1, box2, box3;
+    private Box newplaybox, editbox, passbox, passbtnbox;
     private Runnable autoplay;
     private ObjectOutputStream writer;
     private ObjectInputStream reader;
@@ -82,6 +95,11 @@ class MP3Panel extends JFrame{
         editplaylistbtn = new JButton("Editar Playlist");
         deleteplaylistbtn = new JButton("Borrar Playlist");
         addmusicbtn = new JButton("Agregar Musica");
+        passbtn = new JButton(">");
+        returnbtn = new JButton("<");
+        okbtn = new JButton("Ok");
+        cancelbtn = new JButton("Cancelar");
+        playlistnamelabel = new JLabel("Nombre:");
         
         
         if(new File("songs.dat").exists())
@@ -96,6 +114,10 @@ class MP3Panel extends JFrame{
         playlist = new Playlist("My Songs",songsinfolder);
         numtracks = playlist.getNumTracks();
         }
+        playlistboxmodel = new DefaultComboBoxModel(playlistcollection.getCustomPlaylists());
+        playlistbox = new JComboBox(playlistboxmodel);
+        tobeaddedmodel = populateWithSongs(playlistcollection.getAllSongs());
+        tobeadded.setModel(tobeaddedmodel);
         System.out.println("Se consiguieron: " + numtracks + " canciones.");
         currenttrack=0;
         
@@ -143,6 +165,10 @@ class MP3Panel extends JFrame{
         editplaylistbtn.addActionListener(actman);
         deleteplaylistbtn.addActionListener(actman);
         addmusicbtn.addActionListener(actman);
+        passbtn.addActionListener(actman);
+        returnbtn.addActionListener(actman);
+        okbtn.addActionListener(actman);
+        cancelbtn.addActionListener(actman);
         
         setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
         playerpanel = new JPanel();
@@ -177,6 +203,15 @@ class MP3Panel extends JFrame{
         box3.add(playerpanel);
         box3.add(functionalpanel);
         add(box3);
+        newplaybox=new Box(BoxLayout.X_AXIS);
+        editbox=new Box(BoxLayout.X_AXIS);
+        passbtnbox = new Box(BoxLayout.Y_AXIS);
+        passbtnbox.add(passbtn);
+        passbtnbox.add(returnbtn);
+        passbox = new Box(BoxLayout.X_AXIS);
+        passbox.add(tobeadded);
+        passbox.add(passbtnbox);
+        passbox.add(added);
     }
     
     private List<String> reapSongs(String dir)
@@ -214,6 +249,28 @@ class MP3Panel extends JFrame{
         {
             
         }
+    }
+    
+    private DefaultListModel populate(int b)
+    {
+        Playlist[] adder;
+        DefaultListModel populated = new DefaultListModel();
+        if(b==1)
+            adder = playlistcollection.getCustomPlaylists();
+        else
+            adder = playlistcollection.getAutomatedPlaylists();
+        for(int i=0; i<adder.length; i++)
+            populated.addElement(adder[i]);
+        return populated;
+    }
+    private DefaultListModel populateWithSongs(Playlist a)
+    {
+        DefaultListModel populated = new DefaultListModel();
+        for(int i=0; i<a.getNumTracks(); i++)
+        {
+            populated.addElement(a.getSong(i));
+        }
+        return populated;
     }
     
     private void saveCollection()
@@ -343,17 +400,106 @@ class MP3Panel extends JFrame{
             
             if(e.getSource() == createplaylistbtn)
             {
+                addedmodel.clear();
+                added.setModel(addedmodel);
+                //add buttons
+                createplaylistdialog.setLayout(new BoxLayout(createplaylistdialog, BoxLayout.Y_AXIS));
+                createplaylistdialog.add(passbox);
+                playlistnameinput.setText("");
+                newplaybox.add(playlistnamelabel);
+                newplaybox.add(playlistnameinput);
+                newplaybox.add(okbtn);
+                newplaybox.add(cancelbtn);
+                createplaylistdialog.add(newplaybox);
+                createplaylistdialog.pack();
+                createplaylistdialog.setVisible(true);
                 
             }
             
             if(e.getSource() == editplaylistbtn)
             {
+                toedit = JOptionPane.showOptionDialog(null, "Escoga la playlist a editar:", "Editar Playlist", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, playlistcollection.getCustomPlaylists(), playlistcollection.getCustomPlaylists()[0]);
+                addedmodel = populateWithSongs(playlistcollection.getCustomPlaylists()[toedit]);
+                added.setModel(addedmodel);
+                //add buttons
+                editplaylistdialog.setLayout(new BoxLayout(editplaylistdialog, BoxLayout.Y_AXIS));
+                editplaylistdialog.add(passbox);
+                playlistnameinput.setText(playlistcollection.getCustomPlaylists()[toedit].getName());
+                editbox.add(playlistnamelabel);
+                editbox.add(playlistnameinput);
+                editbox.add(okbtn);
+                editbox.add(cancelbtn);
+                editplaylistdialog.add(editbox);
+                editplaylistdialog.pack();
+                editplaylistdialog.setVisible(true);
                 
+            }
+            
+            if(e.getSource() == passbtn)
+            {
+                passer = tobeadded.getSelectedValuesList();
+                for(int i=0; i<passer.size(); i++)
+                {
+                    tobeaddedmodel.removeElement(passer.get(i));
+                    addedmodel.addElement(passer.get(i));
+                }
+                added.setModel(addedmodel);
+                tobeadded.setModel(tobeaddedmodel);
+            }
+            
+            if(e.getSource() == returnbtn)
+            {
+                passer = added.getSelectedValuesList();
+                for(int i=0; i<passer.size(); i++)
+                {
+                    addedmodel.removeElement(passer.get(i));
+                    tobeaddedmodel.removeElement(passer.get(i));
+                }
+                tobeadded.setModel(tobeaddedmodel);
+                added.setModel(addedmodel);
+            }
+            
+            if(e.getSource() == okbtn)
+            {
+                
+                if(okbtn.getParent() == newplaybox)
+                {
+                    playlistcollection.addPlaylist(new Playlist(playlistnameinput.getText(),(Song[]) addedmodel.toArray()));
+                    createplaylistdialog.dispose();
+                }
+                else
+                {
+                    playlistcollection.getCustomPlaylists()[toedit].setName(playlistnameinput.getText());
+                    playlistcollection.getCustomPlaylists()[toedit].setSongList((Song[])addedmodel.toArray());
+                    editplaylistdialog.dispose();
+                }
+                tobeaddedmodel = populateWithSongs(playlistcollection.getAllSongs());
+                tobeadded.setModel(tobeaddedmodel);
+                addedmodel.clear();
+                added.setModel(addedmodel);
+                //More JLists to be updated
+                playlistnameinput.setText("");
+            }
+            
+            if(e.getSource() == cancelbtn)
+            {
+                tobeaddedmodel = populateWithSongs(playlistcollection.getAllSongs());
+                tobeadded.setModel(tobeaddedmodel);
+                addedmodel.clear();
+                added.setModel(addedmodel);
+                playlistnameinput.setText("");
+                if(cancelbtn.getParent() == editbox)
+                    editplaylistdialog.dispose();
+                else
+                    createplaylistdialog.dispose();
             }
             
             if(e.getSource() == deleteplaylistbtn)
             {
-                
+                playlistcollection.deletePlaylist((Playlist)JOptionPane.showInputDialog(null,"¿Cual playlist desea borrar?", "Borrar Playlist", JOptionPane.QUESTION_MESSAGE, null, playlistcollection.getCustomPlaylists(), playlistcollection.getCustomPlaylists()[0]));
+                //No se para que es la combobox,, averiguar luego
+                playlistboxmodel = new DefaultComboBoxModel(playlistcollection.getCustomPlaylists());
+                playlistbox.setModel(playlistboxmodel);
             }
             
             if(e.getSource() == addmusicbtn)

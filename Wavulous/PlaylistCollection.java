@@ -58,6 +58,14 @@ public class PlaylistCollection implements Serializable
         customplaylists = deleter;
     }
     
+    public void deletePlaylist(Playlist a)
+    {
+        for(int i=0; i<customplaylists.length; i++)
+            if(a.getName().equals(customplaylists[i].getName()))
+                if(Arrays.equals(a.getSongList(),customplaylists[i].getSongList()))
+                    deletePlaylist(i);        
+    }
+    
     public void addSongs(List<String> a)
     {
         int c=0;
@@ -70,9 +78,28 @@ public class PlaylistCollection implements Serializable
         getArtistNames();
     }
     
+    public Playlist getAllSongs()
+    {
+        return allsongs;
+    }
+    
     public int getAllSongsLength()
     {
         return allsongs.getNumTracks();
+    }
+    
+    public Playlist[] getCustomPlaylists()
+    {
+        return customplaylists;
+    }
+    
+    public Playlist[] getAutomatedPlaylists()
+    {
+        Playlist[] allandauto = new Playlist[artistplaylists.length+1];
+        allandauto[0] = allsongs;
+        for(int i=1; i<allandauto.length; i++)
+            allandauto[i] = artistplaylists[i-1];
+        return allandauto;
     }
     
     private void getArtistNames()

@@ -40,6 +40,12 @@ class Playlist implements Serializable
         }
     }
     
+    public Playlist(String a, Song[] b)
+    {
+        name = a;
+        songlist = b;
+    }
+    
     public Song[] getSongList()
     {
         return songlist;

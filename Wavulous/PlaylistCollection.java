@@ -126,18 +126,20 @@ public class PlaylistCollection implements Serializable
         artistplaylists = new Playlist[artistnames.length];
         for(int i=0; i<artistplaylists.length; i++)
         {
-            artistplaylists[i] = new Playlist(artistnames[i]);
-            populatePlaylist(artistplaylists[i]);
+            artistplaylists[i] = populatePlaylist(artistnames[i]);
         }
     }
     
-    private void populatePlaylist(Playlist a)
+    private Playlist populatePlaylist(String b)
     {
+        Playlist a = new Playlist(b);
+        System.out.println("Number of songs in allsongs: " + allsongs.getNumTracks());
         for(int i=0; i<allsongs.getNumTracks(); i++)
         {
-            if(allsongs.getSong(i).getArtist().equals(a.getName()))
+            if(b.equals(allsongs.getSong(i).getArtist()))
                 a.addSong(allsongs.getSong(i));
         }
+        return a;
     }
     
 }

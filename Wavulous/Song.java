@@ -125,9 +125,6 @@ class Song implements Serializable
                case "album":
                    album = value.toString();
                    break;
-               case "image":
-                   albumart = new ImageIcon((Image)value);
-                   break;
            }
     }
     

@@ -42,6 +42,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -70,7 +72,7 @@ class MP3Panel extends JFrame{
     private Song song1, song2, song3, thissong;
     private URI thisURI;
     private File thisfile;
-    private Box box1, box2, box3;
+    private Box box1, box2, box3, box4;
     private Box newplaybox, editbox, passbox, passbtnbox;
     private Runnable autoplay;
     private ObjectOutputStream writer;
@@ -109,13 +111,12 @@ class MP3Panel extends JFrame{
         }
         else
         {
-        getpath = JOptionPane.showInputDialog("Porfavor, ingrese el path de donde desea agregar su musica.\n Ej: C:/Usuarios/Yo/Musica");
+        getpath = JOptionPane.showInputDialog("Porfavor, ingrese el path de donde desea agregar su musica.\n Ej: C:/Usuarios/Yo/Musica", "Bienvenido a BlueMP3!");
         songsinfolder = reapSongs(getpath);
-        playlist = new Playlist("My Songs",songsinfolder);
+        playlistcollection = new PlaylistCollection(songsinfolder);
+        playlist = playlistcollection.getAllSongs();
         numtracks = playlist.getNumTracks();
         }
-        playlistboxmodel = new DefaultComboBoxModel(playlistcollection.getCustomPlaylists());
-        playlistbox = new JComboBox(playlistboxmodel);
         tobeaddedmodel = populateWithSongs(playlistcollection.getAllSongs());
         tobeadded.setModel(tobeaddedmodel);
         System.out.println("Se consiguieron: " + numtracks + " canciones.");
@@ -170,6 +171,8 @@ class MP3Panel extends JFrame{
         okbtn.addActionListener(actman);
         cancelbtn.addActionListener(actman);
         
+        ListManager listman = new ListManager();
+        
         setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
         playerpanel = new JPanel();
         playerpanel.setLayout(new BoxLayout(playerpanel, BoxLayout.Y_AXIS));
@@ -185,10 +188,14 @@ class MP3Panel extends JFrame{
         functionalpane = new JTabbedPane();
         artistpanel = new JPanel(new BorderLayout());
         playlistlist = new JList(); //Aqui iran las playlists generadas.
+        playlistlistmodel = populate(0);
+        playlistlist.setModel(playlistlistmodel);
         artistpanel.add(playlistlist);
         functionalpane.add("Artistas",artistpanel);
         custompanel = new JPanel(new BorderLayout());
         customplaylistlist = new JList();
+        customplaylistlistmodel = populate(1);
+        customplaylistlist.setModel(customplaylistlistmodel);
         custompanel.add(customplaylistlist);
         functionalpane.add("Playlists Personalizadas",custompanel);
         optionpanel = new JPanel();
@@ -202,7 +209,14 @@ class MP3Panel extends JFrame{
         box3 = new Box(BoxLayout.Y_AXIS);
         box3.add(playerpanel);
         box3.add(functionalpanel);
+        box4 = new Box(BoxLayout.Y_AXIS);
+        songlist = new JList();
+        songlist.addListSelectionListener(listman);
+        songlistmodel = populateWithSongs(playlistcollection.getAllSongs());
+        songlist.setModel(songlistmodel);
+        box4.add(songlist);
         add(box3);
+        add(box4);
         newplaybox=new Box(BoxLayout.X_AXIS);
         editbox=new Box(BoxLayout.X_AXIS);
         passbtnbox = new Box(BoxLayout.Y_AXIS);
@@ -497,9 +511,6 @@ class MP3Panel extends JFrame{
             if(e.getSource() == deleteplaylistbtn)
             {
                 playlistcollection.deletePlaylist((Playlist)JOptionPane.showInputDialog(null,"¿Cual playlist desea borrar?", "Borrar Playlist", JOptionPane.QUESTION_MESSAGE, null, playlistcollection.getCustomPlaylists(), playlistcollection.getCustomPlaylists()[0]));
-                //No se para que es la combobox,, averiguar luego
-                playlistboxmodel = new DefaultComboBoxModel(playlistcollection.getCustomPlaylists());
-                playlistbox.setModel(playlistboxmodel);
             }
             
             if(e.getSource() == addmusicbtn)
@@ -507,9 +518,61 @@ class MP3Panel extends JFrame{
                 getpath = JOptionPane.showInputDialog("Porfavor, ingrese el path de donde desea agregar su musica.\nEj: C:\\Usuarios\\Yo\\Musica");
                 songsinfolder = reapSongs(getpath);
                 playlistcollection.addSongs(songsinfolder);
-                //JLists must be refreshed, etc, etc.
+                playlistlistmodel = populate(0);
+                customplaylistlistmodel = populate(1);
+                playlistlist.setModel(playlistlistmodel);
+                customplaylistlist.setModel(customplaylistlistmodel);
+                //The third list/panel must be reset and the player stopped.
             }
         }
+    }
+    
+    private class ListManager implements ListSelectionListener
+    {
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if(e.getSource() == songlist)
+            {
+                Platform.runLater(new Runnable()
+                {
+                    public void run()
+                    {
+                        if((Song[])songlistmodel.toArray() == playlist.getSongList())
+                        {
+                            player.dispose();
+                            player = new MediaPlayer(playlist.getSong(songlist.getSelectedIndex()).getMedia());
+                            player.setOnEndOfMedia(autoplay);
+                            currenttrack=songlist.getSelectedIndex();
+                        }
+                        else
+                        {
+                            player.dispose();
+                            playlist.setSongList((Song[])songlistmodel.toArray());
+                            player = new MediaPlayer(playlist.getSong(songlist.getSelectedIndex()).getMedia());
+                            player.setOnEndOfMedia(autoplay);
+                            numtracks = playlist.getNumTracks();
+                            currenttrack = songlist.getSelectedIndex();
+                        }
+                        nowplaying.setText(playlist.getSong(currenttrack).printInfo());
+                        playbtn.setIcon(pause);
+                    }
+                });
+            }
+            
+            if(e.getSource() == playlistlist)
+            {
+                songlistmodel = populateWithSongs(playlistcollection.getAutomatedPlaylists()[playlistlist.getSelectedIndex()]);
+                songlist.setModel(songlistmodel);
+            }
+            
+            if(e.getSource() == customplaylistlist)
+            {
+                songlistmodel = populateWithSongs(playlistcollection.getCustomPlaylists()[customplaylistlist.getSelectedIndex()]);
+                songlist.setModel(songlistmodel);
+            }
+        }
+        
     }
     
     private class windowManager implements WindowListener

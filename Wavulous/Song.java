@@ -9,6 +9,7 @@ package javafxswingtest;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -22,7 +23,8 @@ import javax.swing.ImageIcon;
  *
  * @author Alex
  */
-class Song {
+class Song implements Serializable
+{
        private String filename, name, artist, album;
        private Media song;
        private URI aURI;
@@ -107,6 +109,7 @@ class Song {
             }
             
         });
+        checkForNulls();
     }
     
     private void detectMetadata(String key, Object value)
@@ -126,6 +129,16 @@ class Song {
                    albumart = new ImageIcon((Image)value);
                    break;
            }
+    }
+    
+    private void checkForNulls()
+    {
+        if(name == null)
+            name = "Untitled";
+         if(artist == null)
+            artist = "Unknown Artist";
+        if(album == null)
+            album = "Unknown Album";
     }
     
     public void readID3Tag(String a)
@@ -162,12 +175,6 @@ class Song {
     
     public String printInfo()
     {
-        if(name == null)
-            name = "Untitled";
-        if(artist == null)
-            artist = "Unknown Artist";
-        if(album == null)
-            album = "Unknown Album";
         String info = name + "\n" + artist + "\n" + album;
         return info;
     }

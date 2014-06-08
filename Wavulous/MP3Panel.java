@@ -10,6 +10,8 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -71,6 +73,8 @@ class MP3Panel extends JFrame{
     public MP3Panel()
     {
         super("BlueMP3");
+        windowManager winMan = new windowManager();
+        addWindowListener(winMan);
         play = new ImageIcon("play.png");
         pause = new ImageIcon("pause.png");
         fwd = new ImageIcon("next.png");
@@ -357,4 +361,71 @@ class MP3Panel extends JFrame{
         }
     }
     
+    private void saveCollection()
+    {
+        //  ABRIR el archivo
+            try
+            {
+                    writer = new ObjectOutputStream(new FileOutputStream("songs.dat"));
+            }
+            catch (FileNotFoundException e)
+            {
+                JOptionPane.showMessageDialog(null, "File Not Found Exception");
+            }
+            catch (IOException e)
+            {
+                JOptionPane.showMessageDialog(null, "IO Exception");
+            }
+            //  ESCRIBIR/GRABAR al archivo
+                try
+                {
+                        writer.writeObject(automatedplaylists);
+                }
+                catch (IOException horror)
+                {
+                    JOptionPane.showMessageDialog(null, "NO pude escribir!");
+                }
+            //  CERRAR el archivo
+            try
+            {
+                    writer.close();
+            }
+            catch (IOException e)
+            {
+                JOptionPane.showMessageDialog(null, "No pude cerrar archivo!");
+            }
+    }
+    private class windowManager implements WindowListener
+    {
+        @Override
+        public void windowClosing(WindowEvent e)
+        {
+            saveCollection();
+        }
+        @Override
+        public void windowOpened(WindowEvent e) {
+            
+        }
+        @Override
+        public void windowClosed(WindowEvent e) {
+            
+        }
+        @Override
+        public void windowIconified(WindowEvent e) {
+            
+        }
+        @Override
+        public void windowDeiconified(WindowEvent e) {
+            
+        }
+
+        @Override
+        public void windowActivated(WindowEvent e) {
+            
+        }
+        @Override
+        public void windowDeactivated(WindowEvent e) {
+            
+        }
+    }
 }

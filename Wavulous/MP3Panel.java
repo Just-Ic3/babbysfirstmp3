@@ -51,6 +51,7 @@ class MP3Panel extends JFrame{
     private JButton playbtn, fwdbtn, bwdbtn, createplaylistbtn, editplaylistbtn, deleteplaylistbtn, addmusicbtn;
     private ImageIcon play, pause, fwd, bwd;
     private JTextArea nowplaying;
+    private PlaylistCollection automatedplaylists, customplaylists;
     private Playlist playlist;
     private Song song1, song2, song3, thissong;
     private URI thisURI;
@@ -77,6 +78,8 @@ class MP3Panel extends JFrame{
         editplaylistbtn = new JButton("Editar Playlist");
         deleteplaylistbtn = new JButton("Borrar Playlist");
         addmusicbtn = new JButton("Agregar Musica");
+        
+        
         /* To be deprecated for file calling, etc.
         song1 = new Song("Blumenkranz.mp3");
         song2 = new Song("Dimensiontripper!!!!.mp3");
@@ -85,29 +88,36 @@ class MP3Panel extends JFrame{
         playlist.addSong(song2);
         playlist.addSong(song3);
         */
-        
+        if(new File("songs.dat").exists())
+        {
+            deserializeExistingData();
+            numtracks = automatedplaylists.getAllSongsLength();
+            
+            /*Agarrar canciones de songs.dat
+            A implementarse luego ya que existan varias playlists o playlist collections.
+            try
+            {
+            writer = new ObjectOutputStream(new FileOutputStream("songs.dat"));
+            }
+            catch(FileNotFoundException e)
+            {
+                System.out.println("No se encontro el archivo.");
+            } 
+            catch (IOException ex){ 
+                System.out.println("No se pudo escribir el archivo.");
+            }   
+            */
+        }
+        else
+        {
         getpath = JOptionPane.showInputDialog("Porfavor, ingrese el path de donde desea agregar su musica.\n Ej: C:/Usuarios/Yo/Musica");
         songsinfolder = reapSongs(getpath);
         playlist = new Playlist("My Songs",songsinfolder);
-        
         numtracks = playlist.getNumTracks();
-        System.out.println("Se consiguieron: " + numtracks + " canciones.");
-        currenttrack = 0;
-        
-        
-        /* A implementarse luego ya que existan varias playlists o playlist collections.
-        try
-        {
-        writer = new ObjectOutputStream(new FileOutputStream("songs.dat"));
         }
-        catch(FileNotFoundException e)
-        {
-            System.out.println("No se encontro el archivo.");
-        } 
-        catch (IOException ex){ 
-            System.out.println("No se pudo escribir el archivo.");
-        }   
-        */
+        System.out.println("Se consiguieron: " + numtracks + " canciones.");
+        currenttrack=0;
+        
         autoplay = new Runnable(){
             public void run()
             {
@@ -201,6 +211,25 @@ class MP3Panel extends JFrame{
         }
         System.out.println("Si entre, nomas no sabes que pedo :b");
         return mp3s;
+    }
+    
+    private void deserializeExistingData()
+    {
+        try
+        {
+            reader = new ObjectInputStream(new FileInputStream("songs.dat"));
+            automatedplaylists = (PlaylistCollection) reader.readObject();
+            customplaylists = (PlaylistCollection) reader.readObject();
+            reader.close();
+        }
+        catch(FileNotFoundException e)
+        {
+            
+        }
+        catch(IOException | ClassNotFoundException ex)
+        {
+            
+        }
     }
     
     /*private Media intoMedia(Song a)

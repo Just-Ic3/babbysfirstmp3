@@ -9,6 +9,7 @@ package javafxswingtest;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -22,7 +23,8 @@ import javax.swing.ImageIcon;
  *
  * @author Alex
  */
-class Song {
+class Song implements Serializable
+{
        private String filename, name, artist, album;
        private Media song;
        private URI aURI;

@@ -91,7 +91,9 @@ class Song implements Serializable
 
             @Override
             public void run() {
-        song = new Media("file:/" + filename.replace(" ","%20").replace("\\","/"));
+        String filenamereplacer = "file:/" + filename.replace(" ","%20").replace("\\","/");
+        System.out.println("makeMedia imprime: " + filenamereplacer);
+        song = new Media(filenamereplacer);
         readID3Tag();
             }
         }); 
@@ -118,12 +120,15 @@ class Song implements Serializable
            {
                case "title":
                    name = value.toString();
+                   System.out.println(name);
                    break;
                case "artist":
                    artist = value.toString();
+                   System.out.println(artist);
                    break;
                case "album":
                    album = value.toString();
+                   System.out.println(album);
                    break;
            }
     }

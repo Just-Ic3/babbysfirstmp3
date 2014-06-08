@@ -20,17 +20,20 @@ public class PlaylistCollection implements Serializable
     private Playlist allsongs;
     private Playlist[] artistplaylists;
     private Playlist[] customplaylists;
-    private ArrayList<String> artistdatabase;
+    private String[] artistnames;
     
     public PlaylistCollection()
     {
         
     }
     
-    public PlaylistCollection(List<String> a)
+    public PlaylistCollection(String[] a)
     {
-        allsongs = new Playlist("Todas las Canciones",a);
-        getArtistNames();
+        allsongs = new Playlist("Todas las Canciones", a);
+        System.out.println(allsongs.getSong(0));
+        System.out.println(allsongs.getSong(0).printInfo());
+        if(allsongs.getNumTracks() == a.length)
+            getArtistNames();
         
     }
     
@@ -66,12 +69,12 @@ public class PlaylistCollection implements Serializable
                     deletePlaylist(i);        
     }
     
-    public void addSongs(List<String> a)
+    public void addSongs(String[] a)
     {
         int c=0;
-        for(int i=0; i<a.size(); i++)
+        for(int i=0; i<a.length; i++)
         {
-            if(allsongs.addSong(a.get(i)))
+            if(allsongs.addSong(a[i]))
                 c++;
         }
         System.out.println("Se agregaron: " + c + " canciones.");
@@ -104,25 +107,31 @@ public class PlaylistCollection implements Serializable
     
     private void getArtistNames()
     {
-        artistdatabase = new ArrayList<>(allsongs.getNumTracks());
+        artistnames = new String[0];
         for(int i=0; i<allsongs.getNumTracks(); i++)
         {
-            if(!artistdatabase.contains(allsongs.getSong(i).getArtist()))
+            if(alreadyHaveArtist(allsongs.getSong(i).getArtist()))
             {
-                artistdatabase.add(allsongs.getSong(i).getArtist());
+            } 
+            else 
+            {
+                addArtist(allsongs.getSong(i).getArtist());
             }
         }
-        artistdatabase.trimToSize();
+        Arrays.sort(artistnames);
         generateArtistPlaylists();
     }
     
+    
+    
     private void generateArtistPlaylists()
     {
-        String[] artistnames = new String[artistdatabase.size()];
-        for(int i=0; i<artistnames.length; i++)
-            artistnames[i]=(String)artistdatabase.get(i);
-        Arrays.sort(artistnames);
-        
+        /*for(int i=0; i<artistnames.length; i++)
+        {    
+            artistnames[i]= (String)artistdatabase.get(i);
+            System.out.println(artistnames[i]);
+        }
+        System.out.println(artistnames[0]); */
         artistplaylists = new Playlist[artistnames.length];
         for(int i=0; i<artistplaylists.length; i++)
         {
@@ -140,6 +149,29 @@ public class PlaylistCollection implements Serializable
                 a.addSong(allsongs.getSong(i));
         }
         return a;
+    }
+    
+    private boolean alreadyHaveArtist(String a)
+    {
+        if(artistnames.length==0)
+            return false;
+        for(int i=0; i<artistnames.length; i++)
+        {
+            if(a.equals(artistnames[i]))
+                return true;
+        }
+        return false;
+    }
+    
+    private void addArtist(String a)
+    {
+        String[] adder = new String[artistnames.length+1];
+        for(int i=0; i<artistnames.length; i++)
+        {
+            adder[i]=artistnames[i];
+        }
+        adder[artistnames.length]=a;
+        artistnames=adder;
     }
     
 }

@@ -30,13 +30,13 @@ class Playlist implements Serializable
         songlist = new Song[0];
     }
     
-    public Playlist(String a, List<String>b)
+    public Playlist(String a, String[] b)
     {
         name = a;
-        songlist = new Song[b.size()];
+        songlist = new Song[b.length];
         for(int i=0; i<songlist.length; i++)
         {
-            songlist[i] = new Song(b.get(i));
+            songlist[i] = new Song(b[i]);
         }
     }
     

@@ -79,7 +79,7 @@ class MP3Panel extends JFrame{
     private ObjectInputStream reader;
     private String getpath;
     private JOptionPane pathgiver;
-    private List<String> songsinfolder;
+    private String[] songsinfolder;
     
     public MP3Panel()
     {
@@ -228,23 +228,25 @@ class MP3Panel extends JFrame{
         passbox.add(added);
     }
     
-    private List<String> reapSongs(String dir)
+    private String[] reapSongs(String dir)
     {
         int i=0; //For debugging plz take out later.
-        List<String> mp3s = new ArrayList<String>();
         File directory = new File(dir);
+        String[] mp3s = new String[directory.list().length];
         for(File file : directory.listFiles())
         {
             System.out.println(file.getName());
             if(file.getName().toLowerCase().endsWith((".mp3")))
             {
-                mp3s.add(dir + "/" + file.getName());
-                System.out.println("Esto es lo que genera reapSongs: " + mp3s.get(i));
+                mp3s[i]=(dir + "/" + file.getName());
+                System.out.println("Esto es lo que genera reapSongs: " + mp3s[i]);
                 i++;
             }    
         }
-        System.out.println("Si entre, nomas no sabes que pedo :b");
-        return mp3s;
+        String[] cutter = new String[i];
+        for(int j=0; j<cutter.length; j++)
+            cutter[j]=mp3s[j];
+        return cutter;
     }
     
     private void deserializeExistingData()

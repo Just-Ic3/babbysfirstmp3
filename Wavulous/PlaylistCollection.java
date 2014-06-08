@@ -19,6 +19,7 @@ public class PlaylistCollection implements Serializable
 {
     private Playlist allsongs;
     private Playlist[] artistplaylists;
+    private Playlist[] customplaylists;
     private ArrayList<String> artistdatabase;
     
     public PlaylistCollection()
@@ -31,6 +32,30 @@ public class PlaylistCollection implements Serializable
         allsongs = new Playlist("Todas las Canciones",a);
         getArtistNames();
         
+    }
+    
+    public void addPlaylist(Playlist a)
+    {
+        Playlist[] customplaylistadd = new Playlist[customplaylists.length+1];
+        for(int i=0; i<customplaylists.length; i++)
+            customplaylistadd[i] = customplaylists[i];
+        customplaylistadd[customplaylists.length] = a;
+        customplaylists = customplaylistadd;
+    }
+    
+    public void deletePlaylist(int a)
+    {
+        Playlist[] deleter = new Playlist[customplaylists.length-1];
+        int b=0;
+        for(int i=0; i<deleter.length; i++)
+        {
+            if(i!=a)
+                deleter[i]=customplaylists[b];
+            else
+                deleter[i]=customplaylists[++b];
+            b++;
+        }
+        customplaylists = deleter;
     }
     
     public void addSongs(List<String> a)

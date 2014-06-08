@@ -22,13 +22,9 @@ import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.Stage;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -57,7 +53,7 @@ class MP3Panel extends JFrame{
     private JButton a;
     private ImageIcon play, pause, fwd, bwd;
     private JTextArea nowplaying;
-    private PlaylistCollection automatedplaylists, customplaylists;
+    private PlaylistCollection playlistcollection;
     private Playlist playlist;
     private Song song1, song2, song3, thissong;
     private URI thisURI;
@@ -88,33 +84,10 @@ class MP3Panel extends JFrame{
         addmusicbtn = new JButton("Agregar Musica");
         
         
-        /* To be deprecated for file calling, etc.
-        song1 = new Song("Blumenkranz.mp3");
-        song2 = new Song("Dimensiontripper!!!!.mp3");
-        song3 = new Song("misterioso.mp3");
-        playlist.addSong(song1);
-        playlist.addSong(song2);
-        playlist.addSong(song3);
-        */
         if(new File("songs.dat").exists())
         {
             deserializeExistingData();
-            numtracks = automatedplaylists.getAllSongsLength();
-            
-            /*Agarrar canciones de songs.dat
-            A implementarse luego ya que existan varias playlists o playlist collections.
-            try
-            {
-            writer = new ObjectOutputStream(new FileOutputStream("songs.dat"));
-            }
-            catch(FileNotFoundException e)
-            {
-                System.out.println("No se encontro el archivo.");
-            } 
-            catch (IOException ex){ 
-                System.out.println("No se pudo escribir el archivo.");
-            }   
-            */
+            numtracks = playlistcollection.getAllSongsLength();
         }
         else
         {
@@ -230,8 +203,7 @@ class MP3Panel extends JFrame{
         try
         {
             reader = new ObjectInputStream(new FileInputStream("songs.dat"));
-            automatedplaylists = (PlaylistCollection) reader.readObject();
-            customplaylists = (PlaylistCollection) reader.readObject();
+            playlistcollection = (PlaylistCollection) reader.readObject();
             reader.close();
         }
         catch(FileNotFoundException e)
@@ -241,6 +213,38 @@ class MP3Panel extends JFrame{
         catch(IOException | ClassNotFoundException ex)
         {
             
+        }
+    }
+    
+    private void saveCollection()
+    {
+        try //Abrir el archivo
+        {
+            writer = new ObjectOutputStream(new FileOutputStream("songs.dat"));
+        }
+        catch(FileNotFoundException e)
+        {
+            JOptionPane.showMessageDialog(null, "File Not Found Exception");
+        }
+        catch(IOException e)
+        {
+            JOptionPane.showMessageDialog(null, "IO Exception");
+        }
+        try //Escribir/Grabar al arcihvo
+        {
+            writer.writeObject(playlistcollection);
+        }
+        catch(IOException horror)
+        {
+            JOptionPane.showMessageDialog(null, "No pude escribir!");
+        }
+        try //Cerrar el archivo
+        {
+            writer.close();
+        }    
+        catch(IOException e)
+        {
+            JOptionPane.showMessageDialog(null, "No pude cerrar el archivo!");
         }
     }
     
@@ -356,45 +360,12 @@ class MP3Panel extends JFrame{
             {
                 getpath = JOptionPane.showInputDialog("Porfavor, ingrese el path de donde desea agregar su musica.\nEj: C:\\Usuarios\\Yo\\Musica");
                 songsinfolder = reapSongs(getpath);
-                automatedplaylists.addSongs(songsinfolder);
+                playlistcollection.addSongs(songsinfolder);
+                //JLists must be refreshed, etc, etc.
             }
         }
     }
     
-    private void saveCollection()
-    {
-        //  ABRIR el archivo
-            try
-            {
-                    writer = new ObjectOutputStream(new FileOutputStream("songs.dat"));
-            }
-            catch (FileNotFoundException e)
-            {
-                JOptionPane.showMessageDialog(null, "File Not Found Exception");
-            }
-            catch (IOException e)
-            {
-                JOptionPane.showMessageDialog(null, "IO Exception");
-            }
-            //  ESCRIBIR/GRABAR al archivo
-                try
-                {
-                        writer.writeObject(automatedplaylists);
-                }
-                catch (IOException horror)
-                {
-                    JOptionPane.showMessageDialog(null, "NO pude escribir!");
-                }
-            //  CERRAR el archivo
-            try
-            {
-                    writer.close();
-            }
-            catch (IOException e)
-            {
-                JOptionPane.showMessageDialog(null, "No pude cerrar archivo!");
-            }
-    }
     private class windowManager implements WindowListener
     {
         @Override
@@ -403,29 +374,35 @@ class MP3Panel extends JFrame{
             saveCollection();
         }
         @Override
-        public void windowOpened(WindowEvent e) {
+        public void windowOpened(WindowEvent e)
+        {
             
         }
         @Override
-        public void windowClosed(WindowEvent e) {
+        public void windowClosed(WindowEvent e)
+        {
             
         }
         @Override
-        public void windowIconified(WindowEvent e) {
+        public void windowIconified(WindowEvent e)
+        {
             
         }
         @Override
-        public void windowDeiconified(WindowEvent e) {
-            
-        }
-
-        @Override
-        public void windowActivated(WindowEvent e) {
+        public void windowDeiconified(WindowEvent e)
+        {
             
         }
         @Override
-        public void windowDeactivated(WindowEvent e) {
+        public void windowActivated(WindowEvent e)
+        {
+            
+        }
+        @Override
+        public void windowDeactivated(WindowEvent e)
+        {
             
         }
     }
+    
 }

@@ -42,7 +42,7 @@ public class JavaFXSwingTest{
             public void run() {
                 fxContainer = new JFXPanel();
                 MP3Panel frame = new MP3Panel();
-                frame.setSize(400,700);
+                frame.setSize(900,700);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);

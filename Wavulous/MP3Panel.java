@@ -51,14 +51,14 @@ import javax.swing.event.ListSelectionListener;
  */
 class MP3Panel extends JFrame{
     private JPanel playerpanel, functionalpanel, listpanel, artistpanel, custompanel, optionpanel;
-    private JDialog createplaylistdialog, editplaylistdialog, deleteplaylistdialog;
+    private JDialog createplaylistdialog, editplaylistdialog;
     private DefaultListModel playlistlistmodel, customplaylistlistmodel, songlistmodel, tobeaddedmodel, addedmodel;
     private JList playlistlist, customplaylistlist, songlist, tobeadded, added;
     private List passer;
     private JComboBox playlistbox;
     private DefaultComboBoxModel playlistboxmodel;
     private JTabbedPane functionalpane;
-    private int numtracks, currenttrack, toedit;
+    private int numtracks=0, currenttrack, toedit;
     private Media playingnow;
     private MediaPlayer player;
     private JButton playbtn, fwdbtn, bwdbtn, createplaylistbtn, editplaylistbtn, deleteplaylistbtn, addmusicbtn;
@@ -69,8 +69,7 @@ class MP3Panel extends JFrame{
     private JLabel playlistnamelabel;
     private PlaylistCollection playlistcollection;
     private Playlist playlist;
-    private Song song1, song2, song3, thissong;
-    private URI thisURI;
+    private Song song1;
     private File thisfile;
     private Box box1, box2, box3, box4;
     private Box newplaybox, editbox, passbox, passbtnbox;
@@ -78,7 +77,6 @@ class MP3Panel extends JFrame{
     private ObjectOutputStream writer;
     private ObjectInputStream reader;
     private String getpath;
-    private JOptionPane pathgiver;
     private String[] songsinfolder;
     
     public MP3Panel()
@@ -102,6 +100,15 @@ class MP3Panel extends JFrame{
         okbtn = new JButton("Ok");
         cancelbtn = new JButton("Cancelar");
         playlistnamelabel = new JLabel("Nombre:");
+        tobeaddedmodel = new DefaultListModel();
+        tobeadded = new JList();
+        added = new JList();
+        addedmodel = new DefaultListModel();
+        playlistcollection = new PlaylistCollection();
+        createplaylistdialog = new JDialog(this);
+        editplaylistdialog = new JDialog(this);
+        playlistnameinput = new JTextField(30);
+        
         
         
         if(new File("songs.dat").exists())
@@ -113,6 +120,7 @@ class MP3Panel extends JFrame{
         {
         getpath = JOptionPane.showInputDialog("Porfavor, ingrese el path de donde desea agregar su musica.\n Ej: C:/Usuarios/Yo/Musica", "Bienvenido a BlueMP3!");
         songsinfolder = reapSongs(getpath);
+        
         playlistcollection = new PlaylistCollection(songsinfolder);
         playlist = playlistcollection.getAllSongs();
         numtracks = playlist.getNumTracks();
@@ -194,12 +202,13 @@ class MP3Panel extends JFrame{
         functionalpane.add("Artistas",artistpanel);
         custompanel = new JPanel(new BorderLayout());
         customplaylistlist = new JList();
+        customplaylistlistmodel = new DefaultListModel();
         customplaylistlistmodel = populate(1);
         customplaylistlist.setModel(customplaylistlistmodel);
         custompanel.add(customplaylistlist);
         functionalpane.add("Playlists Personalizadas",custompanel);
         optionpanel = new JPanel();
-        optionpanel.setLayout(new GridLayout(0,4));
+        optionpanel.setLayout(new GridLayout(4,0));
         optionpanel.add(createplaylistbtn);
         optionpanel.add(editplaylistbtn);
         optionpanel.add(deleteplaylistbtn);
@@ -209,14 +218,14 @@ class MP3Panel extends JFrame{
         box3 = new Box(BoxLayout.Y_AXIS);
         box3.add(playerpanel);
         box3.add(functionalpanel);
-        box4 = new Box(BoxLayout.Y_AXIS);
+        listpanel = new JPanel(new BorderLayout());
         songlist = new JList();
         songlist.addListSelectionListener(listman);
         songlistmodel = populateWithSongs(playlistcollection.getAllSongs());
         songlist.setModel(songlistmodel);
-        box4.add(songlist);
+        listpanel.add(songlist);
         add(box3);
-        add(box4);
+        add(listpanel);
         newplaybox=new Box(BoxLayout.X_AXIS);
         editbox=new Box(BoxLayout.X_AXIS);
         passbtnbox = new Box(BoxLayout.Y_AXIS);
@@ -259,24 +268,26 @@ class MP3Panel extends JFrame{
         }
         catch(FileNotFoundException e)
         {
-            
+            System.out.println("No se leyo nada.");
         }
         catch(IOException | ClassNotFoundException ex)
         {
-            
+            System.out.println("Hubo tambien otras excepciones.");
         }
     }
     
     private DefaultListModel populate(int b)
     {
         Playlist[] adder;
+        adder = playlistcollection.getAutomatedPlaylists();
         DefaultListModel populated = new DefaultListModel();
         if(b==1)
             adder = playlistcollection.getCustomPlaylists();
-        else
-            adder = playlistcollection.getAutomatedPlaylists();
-        for(int i=0; i<adder.length; i++)
-            populated.addElement(adder[i]);
+            if(adder==null)
+                return populated;
+        for (Playlist adder1 : adder) {
+            populated.addElement(adder1);
+        }
         return populated;
     }
     private DefaultListModel populateWithSongs(Playlist a)
@@ -419,8 +430,8 @@ class MP3Panel extends JFrame{
                 addedmodel.clear();
                 added.setModel(addedmodel);
                 //add buttons
-                createplaylistdialog.setLayout(new BoxLayout(createplaylistdialog, BoxLayout.Y_AXIS));
-                createplaylistdialog.add(passbox);
+                createplaylistdialog.setLayout(new BoxLayout(createplaylistdialog.getContentPane(), BoxLayout.Y_AXIS));
+                createplaylistdialog.getContentPane().add(passbox);
                 playlistnameinput.setText("");
                 newplaybox.add(playlistnamelabel);
                 newplaybox.add(playlistnameinput);
@@ -438,7 +449,7 @@ class MP3Panel extends JFrame{
                 addedmodel = populateWithSongs(playlistcollection.getCustomPlaylists()[toedit]);
                 added.setModel(addedmodel);
                 //add buttons
-                editplaylistdialog.setLayout(new BoxLayout(editplaylistdialog, BoxLayout.Y_AXIS));
+                setLayout(new BoxLayout(editplaylistdialog, BoxLayout.Y_AXIS));
                 editplaylistdialog.add(passbox);
                 playlistnameinput.setText(playlistcollection.getCustomPlaylists()[toedit].getName());
                 editbox.add(playlistnamelabel);

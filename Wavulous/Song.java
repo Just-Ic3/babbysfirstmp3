@@ -87,16 +87,11 @@ class Song implements Serializable
         }
          System.out.println(aURI.toString());
         */
-        Platform.runLater(new Runnable() {
 
-            @Override
-            public void run() {
         String filenamereplacer = "file:/" + filename.replace(" ","%20").replace("\\","/");
         System.out.println("makeMedia imprime: " + filenamereplacer);
         song = new Media(filenamereplacer);
-        readID3Tag();
-            }
-        }); 
+        readID3Tag(); 
     }
     
     private void readID3Tag()
